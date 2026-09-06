@@ -29,7 +29,7 @@
       --line: rgba(216,213,205,0.08);
     }
 
-    h1, h2 {
+    h1, h2, h3 {
       font-family: 'Big Shoulders', sans-serif;
       margin: 0;
     }
@@ -154,7 +154,7 @@
     .features {
       position: relative;
       z-index: 5;
-      padding: 80px 5vw 100px;
+      padding: 80px 5vw 60px;
     }
     .features-grid {
       display: grid;
@@ -180,6 +180,103 @@
       color: var(--dim);
       line-height: 1.6;
       margin: 0;
+    }
+
+    /* --- Section Outils Web --- */
+    .tools-section {
+      position: relative;
+      z-index: 5;
+      padding: 40px 5vw 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .tools-section h2 {
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      text-align: center;
+      margin-bottom: 12px;
+      color: var(--text);
+    }
+    .tools-section .section-desc {
+      text-align: center;
+      color: var(--dim);
+      font-size: clamp(0.85rem, 1.4vw, 1rem);
+      margin-bottom: 40px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.6;
+    }
+    .tools-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .tool-card {
+      background: transparent;
+      border: 1px solid var(--line);
+      padding: 24px 28px;
+      transition: border-color 0.3s ease, transform 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+    .tool-card:hover {
+      border-color: var(--red-2);
+      transform: translateY(-2px);
+    }
+    .tool-card .tool-name {
+      font-family: 'Big Shoulders', sans-serif;
+      font-size: clamp(1.3rem, 2vw, 1.6rem);
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+    .tool-card .tool-desc {
+      font-size: clamp(0.75rem, 1.1vw, 0.82rem);
+      color: var(--dim);
+      line-height: 1.5;
+      margin-bottom: 14px;
+      flex: 1;
+    }
+    .tool-card .tool-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text);
+      font-size: clamp(0.7rem, 1vw, 0.78rem);
+      border: 1px solid var(--line);
+      padding: 8px 16px;
+      border-radius: 3px;
+      transition: border-color 0.3s ease, color 0.3s ease;
+      align-self: flex-start;
+      margin-top: auto;
+    }
+    .tool-card .tool-link:hover {
+      border-color: var(--red-2);
+      color: var(--red-2);
+    }
+    .tool-card .tool-link svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+    .tool-badge {
+      font-size: 0.6rem;
+      color: var(--dim);
+      border: 1px solid var(--line);
+      padding: 2px 10px;
+      border-radius: 12px;
+      display: inline-block;
+      margin-bottom: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      align-self: flex-start;
+    }
+    .tool-badge.web {
+      border-color: rgba(216,213,205,0.2);
+      color: #8899bb;
+    }
+    .tool-badge.discord {
+      border-color: rgba(88, 101, 242, 0.3);
+      color: #5865f2;
     }
 
     .bottom-cta {
@@ -212,9 +309,11 @@
     @media (max-width: 480px) {
       header { padding: 14px 4vw; }
       .globe-wrap { width: min(400px, 80vw); height: min(400px, 80vw); }
-      .features { padding: 50px 4vw 60px; }
+      .features { padding: 50px 4vw 40px; }
+      .tools-section { padding: 20px 4vw 50px; }
       .bottom-cta { padding: 0 4vw 50px; }
       .card { padding: 20px 16px; }
+      .tool-card { padding: 18px 16px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -253,6 +352,53 @@
   </div>
 </section>
 
+<!-- Section Outils Web -->
+<section class="tools-section">
+  <h2>⚡ Outils disponibles sur le web</h2>
+  <p class="section-desc">Les meilleurs moteurs de recherche OSINT du moment, accessibles directement en ligne.</p>
+  <div class="tools-grid">
+    <!-- Tool 1 -->
+    <div class="tool-card">
+      <span class="tool-badge web">🌐 Web</span>
+      <div class="tool-name">Leak.fun</div>
+      <div class="tool-desc">Moteur de recherche spécialisé dans la recherche de données exposées et la veille OSINT.</div>
+      <a href="https://leak.fun" target="_blank" rel="noopener" class="tool-link">
+        <svg viewBox="0 0 24 24"><path d="M14 4h-4v8H4v4h8v8h4v-8h8v-4h-8V4z"/></svg>
+        Accéder
+      </a>
+    </div>
+    <!-- Tool 2 -->
+    <div class="tool-card">
+      <span class="tool-badge web">🌐 Web</span>
+      <div class="tool-name">Seek-Now.ru</div>
+      <div class="tool-desc">Moteur de recherche puissant pour l'OSINT, offrant une large couverture de données publiques.</div>
+      <a href="https://seek-now.ru" target="_blank" rel="noopener" class="tool-link">
+        <svg viewBox="0 0 24 24"><path d="M14 4h-4v8H4v4h8v8h4v-8h8v-4h-8V4z"/></svg>
+        Accéder
+      </a>
+    </div>
+    <!-- Tool 3 -->
+    <div class="tool-card">
+      <span class="tool-badge web">🌐 Web</span>
+      <div class="tool-name">Kerbes.org</div>
+      <div class="tool-desc">Outil de recherche avancé pour l'analyse de données et la collecte d'informations en sources ouvertes.</div>
+      <a href="https://kerbes.org" target="_blank" rel="noopener" class="tool-link">
+        <svg viewBox="0 0 24 24"><path d="M14 4h-4v8H4v4h8v8h4v-8h8v-4h-8V4z"/></svg>
+        Accéder
+      </a>
+    </div>
+  </div>
+  <div style="text-align:center; margin-top: 40px; border-top: 1px solid var(--line); padding-top: 30px;">
+    <p style="color: var(--dim); font-size: clamp(0.8rem, 1.2vw, 0.85rem); max-width: 500px; margin: 0 auto;">
+      🔒 Des outils supplémentaires (scrapers, analyseurs, scripts) sont disponibles sur le Discord.
+    </p>
+    <a class="cta" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener" style="margin-top: 16px;">
+      <svg viewBox="0 0 24 24" width="18" height="18"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
+      Voir plus sur Discord
+    </a>
+  </div>
+</section>
+
 <section class="bottom-cta">
   <p>Tout se passe sur Discord. Rejoins le serveur pour accéder aux salons, aux outils et aux ebooks.</p>
   <a class="cta" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
@@ -266,7 +412,7 @@
   <a href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">discord.gg/5H9yJTQEE5</a>
 </footer>
 
-<!-- Three.js - Globe épuré sans pays -->
+<!-- Three.js - Globe épuré -->
 <script type="importmap">
   {
     "imports": {
@@ -281,15 +427,12 @@
   const canvas = document.getElementById('globeCanvas');
   const container = canvas.parentElement;
 
-  // Scene
   const scene = new THREE.Scene();
   scene.background = null;
 
-  // Camera
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
   camera.position.set(0, 0.1, 6.5);
 
-  // Renderer
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
@@ -297,7 +440,6 @@
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // Lumières
   const ambient = new THREE.AmbientLight(0x404060);
   scene.add(ambient);
   const dirLight = new THREE.DirectionalLight(0xffeedd, 0.6);
@@ -307,12 +449,10 @@
   dirLight2.position.set(-2, -1, -3);
   scene.add(dirLight2);
 
-  // --- Globe épuré : sphère transparente avec lignes de latitude/longitude ---
   const radius = 1.6;
   const segments = 48;
   const geometry = new THREE.SphereGeometry(radius, segments, segments);
 
-  // Surface très légèrement visible (presque transparente)
   const material = new THREE.MeshPhongMaterial({
     color: 0x1a2a3a,
     emissive: 0x0a1520,
@@ -325,7 +465,6 @@
   const globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
 
-  // Lignes de latitude/longitude (wireframe) - style bouton
   const wireframeMat = new THREE.MeshBasicMaterial({
     color: 0xd8d5cd,
     wireframe: true,
@@ -336,7 +475,6 @@
   wireframeGlobe.scale.set(1.003, 1.003, 1.003);
   scene.add(wireframeGlobe);
 
-  // Second jeu de lignes plus fines
   const wireframeMat2 = new THREE.MeshBasicMaterial({
     color: 0xd8d5cd,
     wireframe: true,
@@ -349,7 +487,6 @@
   );
   scene.add(wireframeGlobe2);
 
-  // Cercles orbitaux décoratifs
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0x8899bb,
     transparent: true,
@@ -369,7 +506,6 @@
   ring2.rotation.z = -0.5;
   scene.add(ring2);
 
-  // Étoiles discrètes
   const starsGeo = new THREE.BufferGeometry();
   const starCount = 300;
   const positions = new Float32Array(starCount * 3);
@@ -391,7 +527,6 @@
   const stars = new THREE.Points(starsGeo, starsMat);
   scene.add(stars);
 
-  // --- Interactions ---
   let targetRotX = 0;
   let targetRotY = 0;
   let currentRotX = 0;
@@ -449,7 +584,6 @@
     document.addEventListener('mousemove', onMouseMove);
   }
 
-  // --- Resize ---
   const resize = () => {
     const rect = container.getBoundingClientRect();
     const size = Math.min(rect.width, rect.height);
@@ -465,14 +599,12 @@
   window.addEventListener('resize', resize);
   resize();
 
-  // --- Animation ---
   function animate() {
     requestAnimationFrame(animate);
 
     currentRotX += (targetRotX - currentRotX) * 0.05;
     currentRotY += (targetRotY - currentRotY) * 0.05;
 
-    // Rotation automatique + interaction
     globe.rotation.y += 0.0012 + currentRotX * 0.004;
     globe.rotation.x += currentRotY * 0.003;
     globe.rotation.x = Math.max(-0.5, Math.min(0.5, globe.rotation.x));
@@ -488,7 +620,6 @@
 
   animate();
 
-  // --- Parallaxe titre ---
   const title = document.getElementById('title3d');
   if (title) {
     document.addEventListener('mousemove', (e) => {
