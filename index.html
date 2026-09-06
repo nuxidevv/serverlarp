@@ -319,6 +319,26 @@
     @media (prefers-reduced-motion: reduce) {
       * { animation: none !important; transition: none !important; }
     }
+
+    .hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative; /* keep .dots working if it's absolutely positioned */
+}
+
+.globe-wrap {
+  position: relative; /* remove any position: absolute you had here */
+  width: 100%;
+  max-width: 500px; /* adjust to your globe size */
+}
+
+.stage {
+  position: relative; /* remove position: absolute here too */
+  margin-top: 24px;   /* space between globe and button */
+  text-align: center;
+  z-index: 2;
+}
   </style>
 </head>
 <body>
