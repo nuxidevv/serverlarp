@@ -266,7 +266,7 @@
   <a href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">discord.gg/5H9yJTQEE5</a>
 </footer>
 
-<!-- Three.js avec données géographiques réelles -->
+<!-- Three.js - Globe épuré sans pays -->
 <script type="importmap">
   {
     "imports": {
@@ -303,135 +303,51 @@
   const dirLight = new THREE.DirectionalLight(0xffeedd, 0.6);
   dirLight.position.set(1, 2, 3);
   scene.add(dirLight);
+  const dirLight2 = new THREE.DirectionalLight(0x4488ff, 0.3);
+  dirLight2.position.set(-2, -1, -3);
+  scene.add(dirLight2);
 
-  // --- Création d'un globe avec les contours des pays réels ---
-  // On utilise une texture de carte du monde avec des contours nets
-  const canvasTexture = document.createElement('canvas');
-  canvasTexture.width = 2048;
-  canvasTexture.height = 1024;
-  const ctx = canvasTexture.getContext('2d');
+  // --- Globe épuré : sphère transparente avec lignes de latitude/longitude ---
+  const radius = 1.6;
+  const segments = 48;
+  const geometry = new THREE.SphereGeometry(radius, segments, segments);
 
-  // Fond transparent
-  ctx.clearRect(0, 0, 2048, 1024);
-
-  // Dessin des continents à partir de coordonnées simplifiées mais réalistes
-  // Couleur identique au bouton : #d8d5cd avec opacité 0.6
-  ctx.strokeStyle = 'rgba(216, 213, 205, 0.6)';
-  ctx.lineWidth = 2.5;
-  ctx.fillStyle = 'rgba(216, 213, 205, 0.08)';
-
-  // Fonction pour dessiner un pays avec des coordonnées approximatives
-  function drawCountry(points) {
-    ctx.beginPath();
-    const first = points[0];
-    ctx.moveTo(first[0] * 2048, (1 - first[1]) * 1024);
-    for (let i = 1; i < points.length; i++) {
-      ctx.lineTo(points[i][0] * 2048, (1 - points[i][1]) * 1024);
-    }
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();
-  }
-
-  // Coordonnées normalisées (0-1) des continents principaux
-  // Amérique du Nord
-  drawCountry([
-    [0.15, 0.35], [0.20, 0.30], [0.25, 0.28], [0.30, 0.30], [0.32, 0.35],
-    [0.30, 0.40], [0.28, 0.45], [0.25, 0.48], [0.20, 0.50], [0.18, 0.55],
-    [0.15, 0.52], [0.12, 0.48], [0.10, 0.42], [0.12, 0.38]
-  ]);
-
-  // Amérique du Sud
-  drawCountry([
-    [0.28, 0.55], [0.32, 0.52], [0.38, 0.55], [0.42, 0.58], [0.44, 0.62],
-    [0.42, 0.68], [0.40, 0.72], [0.38, 0.78], [0.35, 0.82], [0.32, 0.80],
-    [0.30, 0.76], [0.28, 0.70], [0.26, 0.65], [0.25, 0.60]
-  ]);
-
-  // Europe
-  drawCountry([
-    [0.48, 0.28], [0.52, 0.25], [0.55, 0.28], [0.58, 0.30], [0.60, 0.28],
-    [0.62, 0.32], [0.60, 0.35], [0.58, 0.38], [0.55, 0.40], [0.52, 0.42],
-    [0.50, 0.40], [0.48, 0.38], [0.46, 0.35], [0.45, 0.32]
-  ]);
-
-  // Afrique
-  drawCountry([
-    [0.48, 0.42], [0.52, 0.42], [0.56, 0.44], [0.58, 0.48], [0.60, 0.52],
-    [0.58, 0.58], [0.56, 0.62], [0.54, 0.68], [0.52, 0.72], [0.50, 0.74],
-    [0.48, 0.70], [0.46, 0.66], [0.44, 0.60], [0.44, 0.55], [0.45, 0.48]
-  ]);
-
-  // Asie
-  drawCountry([
-    [0.62, 0.28], [0.68, 0.25], [0.72, 0.22], [0.78, 0.20], [0.82, 0.22],
-    [0.85, 0.25], [0.88, 0.28], [0.90, 0.32], [0.88, 0.36], [0.85, 0.38],
-    [0.82, 0.40], [0.78, 0.42], [0.75, 0.44], [0.72, 0.42], [0.68, 0.40],
-    [0.65, 0.38], [0.63, 0.35], [0.62, 0.32]
-  ]);
-
-  // Asie du Sud-Est / Indonésie
-  drawCountry([
-    [0.82, 0.48], [0.86, 0.46], [0.90, 0.48], [0.92, 0.52], [0.90, 0.56],
-    [0.88, 0.58], [0.85, 0.56], [0.83, 0.52]
-  ]);
-
-  // Australie
-  drawCountry([
-    [0.85, 0.72], [0.88, 0.70], [0.92, 0.72], [0.94, 0.76], [0.92, 0.80],
-    [0.88, 0.82], [0.85, 0.80], [0.83, 0.76]
-  ]);
-
-  // Groenland
-  drawCountry([
-    [0.30, 0.18], [0.35, 0.15], [0.40, 0.18], [0.38, 0.22], [0.35, 0.25],
-    [0.32, 0.22]
-  ]);
-
-  // Ajout de quelques îles
-  ctx.fillStyle = 'rgba(216, 213, 205, 0.6)';
-  const islands = [
-    [0.15, 0.60], [0.20, 0.62], [0.45, 0.78], [0.55, 0.80],
-    [0.70, 0.55], [0.75, 0.58], [0.80, 0.65]
-  ];
-  islands.forEach(([x, y]) => {
-    ctx.beginPath();
-    ctx.arc(x * 2048, (1 - y) * 1024, 6, 0, Math.PI * 2);
-    ctx.fill();
-  });
-
-  // Texture
-  const texture = new THREE.CanvasTexture(canvasTexture);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(1, 1);
-
-  // Globe avec la texture des pays
-  const geometry = new THREE.SphereGeometry(1.6, 64, 64);
+  // Surface très légèrement visible (presque transparente)
   const material = new THREE.MeshPhongMaterial({
-    map: texture,
+    color: 0x1a2a3a,
+    emissive: 0x0a1520,
+    emissiveIntensity: 0.15,
     transparent: true,
-    opacity: 0.9,
-    emissive: new THREE.Color(0x0a1520),
-    emissiveIntensity: 0.1,
-    shininess: 5,
+    opacity: 0.05,
+    shininess: 10,
     side: THREE.DoubleSide,
   });
   const globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
 
-  // Ajout d'un maillage filaire très léger pour les lignes de latitude/longitude
+  // Lignes de latitude/longitude (wireframe) - style bouton
   const wireframeMat = new THREE.MeshBasicMaterial({
     color: 0xd8d5cd,
     wireframe: true,
     transparent: true,
-    opacity: 0.08,
+    opacity: 0.15,
   });
-  const wireframeGlobe = new THREE.Mesh(
-    new THREE.SphereGeometry(1.605, 32, 32),
-    wireframeMat
-  );
+  const wireframeGlobe = new THREE.Mesh(geometry, wireframeMat);
+  wireframeGlobe.scale.set(1.003, 1.003, 1.003);
   scene.add(wireframeGlobe);
+
+  // Second jeu de lignes plus fines
+  const wireframeMat2 = new THREE.MeshBasicMaterial({
+    color: 0xd8d5cd,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.06,
+  });
+  const wireframeGlobe2 = new THREE.Mesh(
+    new THREE.SphereGeometry(radius * 1.006, segments * 0.5, segments * 0.5),
+    wireframeMat2
+  );
+  scene.add(wireframeGlobe2);
 
   // Cercles orbitaux décoratifs
   const ringMat = new THREE.MeshBasicMaterial({
@@ -453,7 +369,7 @@
   ring2.rotation.z = -0.5;
   scene.add(ring2);
 
-  // Étoiles
+  // Étoiles discrètes
   const starsGeo = new THREE.BufferGeometry();
   const starCount = 300;
   const positions = new Float32Array(starCount * 3);
@@ -556,11 +472,13 @@
     currentRotX += (targetRotX - currentRotX) * 0.05;
     currentRotY += (targetRotY - currentRotY) * 0.05;
 
+    // Rotation automatique + interaction
     globe.rotation.y += 0.0012 + currentRotX * 0.004;
     globe.rotation.x += currentRotY * 0.003;
     globe.rotation.x = Math.max(-0.5, Math.min(0.5, globe.rotation.x));
 
     wireframeGlobe.rotation.copy(globe.rotation);
+    wireframeGlobe2.rotation.copy(globe.rotation);
     ring.rotation.y += 0.0005;
     ring2.rotation.y -= 0.0007;
     stars.rotation.y += 0.0002;
