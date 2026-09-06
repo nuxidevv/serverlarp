@@ -101,7 +101,7 @@
       display: block;
       width: 100% !important;
       height: 100% !important;
-      opacity: 0.85;
+      opacity: 0.95;
       border-radius: 50%;
       touch-action: none;
     }
@@ -266,7 +266,7 @@
   <a href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">discord.gg/5H9yJTQEE5</a>
 </footer>
 
-<!-- Three.js avec fallback CDN -->
+<!-- Three.js -->
 <script type="importmap">
   {
     "imports": {
@@ -281,15 +281,15 @@
   const canvas = document.getElementById('globeCanvas');
   const container = canvas.parentElement;
 
-  // Configuration de la scène
+  // Scene
   const scene = new THREE.Scene();
   scene.background = null;
 
-  // Caméra - reculée pour une vue d'ensemble
+  // Camera - reculée
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
   camera.position.set(0, 0.1, 6.5);
 
-  // Renderer avec transparence
+  // Renderer
   const renderer = new THREE.WebGLRenderer({
     canvas,
     alpha: true,
@@ -297,7 +297,7 @@
   });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-  // Lumières douces
+  // Lumières
   const ambient = new THREE.AmbientLight(0x404060);
   scene.add(ambient);
   const dirLight = new THREE.DirectionalLight(0xffeedd, 0.6);
@@ -307,40 +307,54 @@
   dirLight2.position.set(-2, -1, -3);
   scene.add(dirLight2);
 
-  // --- Globe avec contours nets ---
+  // --- Globe avec contours renforcés (comme le bouton) ---
   const radius = 1.6;
   const segments = 64;
   const geometry = new THREE.SphereGeometry(radius, segments, segments);
 
-  // Surface transparente avec très légère teinte
+  // Surface très légèrement visible
   const material = new THREE.MeshPhongMaterial({
     color: 0x1a2a3a,
     emissive: 0x0a1520,
     emissiveIntensity: 0.2,
     transparent: true,
-    opacity: 0.08,
+    opacity: 0.06,
     shininess: 10,
     side: THREE.DoubleSide,
   });
   const globe = new THREE.Mesh(geometry, material);
   scene.add(globe);
 
-  // Lignes de contour (wireframe) comme le bouton
+  // === Lignes de contour renforcées (opacité augmentée) ===
+  // Couleur identique au texte du bouton (#d8d5cd) avec opacité plus forte
   const wireframeMat = new THREE.MeshBasicMaterial({
     color: 0xd8d5cd,
     wireframe: true,
     transparent: true,
-    opacity: 0.2,
+    opacity: 0.45, // augmenté pour une meilleure visibilité
   });
   const wireframeGlobe = new THREE.Mesh(geometry, wireframeMat);
   wireframeGlobe.scale.set(1.003, 1.003, 1.003);
   scene.add(wireframeGlobe);
 
-  // Cercles orbitaux décoratifs
+  // Second jeu de lignes plus fines pour plus de détails
+  const wireframeMat2 = new THREE.MeshBasicMaterial({
+    color: 0xd8d5cd,
+    wireframe: true,
+    transparent: true,
+    opacity: 0.15,
+  });
+  const wireframeGlobe2 = new THREE.Mesh(
+    new THREE.SphereGeometry(radius * 1.006, segments * 0.6, segments * 0.6),
+    wireframeMat2
+  );
+  scene.add(wireframeGlobe2);
+
+  // Cercles orbitaux
   const ringMat = new THREE.MeshBasicMaterial({
     color: 0x8899bb,
     transparent: true,
-    opacity: 0.1,
+    opacity: 0.12,
     side: THREE.DoubleSide,
   });
   const ring = new THREE.Mesh(new THREE.TorusGeometry(2.2, 0.008, 16, 128), ringMat);
@@ -350,13 +364,13 @@
 
   const ring2 = new THREE.Mesh(
     new THREE.TorusGeometry(2.4, 0.005, 16, 128),
-    new THREE.MeshBasicMaterial({ color: 0xaabbdd, transparent: true, opacity: 0.07, side: THREE.DoubleSide })
+    new THREE.MeshBasicMaterial({ color: 0xaabbdd, transparent: true, opacity: 0.08, side: THREE.DoubleSide })
   );
   ring2.rotation.x = Math.PI / 1.8;
   ring2.rotation.z = -0.5;
   scene.add(ring2);
 
-  // Étoiles discrètes
+  // Étoiles
   const starsGeo = new THREE.BufferGeometry();
   const starCount = 300;
   const positions = new Float32Array(starCount * 3);
@@ -378,12 +392,11 @@
   const stars = new THREE.Points(starsGeo, starsMat);
   scene.add(stars);
 
-  // --- Gestion des interactions (souris + tactile) ---
+  // --- Interactions ---
   let targetRotX = 0;
   let targetRotY = 0;
   let currentRotX = 0;
   let currentRotY = 0;
-  let isInteracting = false;
 
   // Souris
   const onMouseMove = (e) => {
@@ -395,8 +408,6 @@
   };
 
   // Tactile
-  let touchStartX = 0;
-  let touchStartY = 0;
   let touchCurrentX = 0;
   let touchCurrentY = 0;
 
@@ -404,11 +415,8 @@
     const touch = e.touches[0];
     if (!touch) return;
     const rect = canvas.getBoundingClientRect();
-    touchStartX = (touch.clientX - rect.left) / rect.width - 0.5;
-    touchStartY = (touch.clientY - rect.top) / rect.height - 0.5;
-    touchCurrentX = touchStartX;
-    touchCurrentY = touchStartY;
-    isInteracting = true;
+    touchCurrentX = (touch.clientX - rect.left) / rect.width - 0.5;
+    touchCurrentY = (touch.clientY - rect.top) / rect.height - 0.5;
   };
 
   const onTouchMove = (e) => {
@@ -429,15 +437,14 @@
   };
 
   const onTouchEnd = () => {
-    isInteracting = false;
-    // Lent retour à la position neutre
+    // Lent retour
     setTimeout(() => {
       targetRotX *= 0.95;
       targetRotY *= 0.95;
     }, 50);
   };
 
-  // Attachement des événements
+  // Attachement
   if ('ontouchstart' in window) {
     canvas.addEventListener('touchstart', onTouchStart, { passive: true });
     canvas.addEventListener('touchmove', onTouchMove, { passive: false });
@@ -447,7 +454,7 @@
     document.addEventListener('mousemove', onMouseMove);
   }
 
-  // --- Redimensionnement adaptatif ---
+  // --- Resize ---
   const resize = () => {
     const rect = container.getBoundingClientRect();
     const size = Math.min(rect.width, rect.height);
@@ -456,7 +463,6 @@
     camera.updateProjectionMatrix();
   };
 
-  // Observer pour détecter les changements de taille
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(() => resize());
     ro.observe(container);
@@ -468,16 +474,15 @@
   function animate() {
     requestAnimationFrame(animate);
 
-    // Lissage des rotations
     currentRotX += (targetRotX - currentRotX) * 0.05;
     currentRotY += (targetRotY - currentRotY) * 0.05;
 
-    // Rotation automatique lente
     globe.rotation.y += 0.0012 + currentRotX * 0.004;
     globe.rotation.x += currentRotY * 0.003;
     globe.rotation.x = Math.max(-0.5, Math.min(0.5, globe.rotation.x));
 
     wireframeGlobe.rotation.copy(globe.rotation);
+    wireframeGlobe2.rotation.copy(globe.rotation);
     ring.rotation.y += 0.0005;
     ring2.rotation.y -= 0.0007;
     stars.rotation.y += 0.0002;
@@ -487,7 +492,7 @@
 
   animate();
 
-  // --- Effet de parallaxe sur le titre (optionnel, adapté) ---
+  // --- Parallaxe titre ---
   const title = document.getElementById('title3d');
   if (title) {
     document.addEventListener('mousemove', (e) => {
@@ -495,7 +500,6 @@
       const y = (e.clientY / window.innerHeight - 0.5) * 3;
       title.style.transform = `translate(${x*0.15}px, ${y*0.1}px)`;
     });
-    // Version tactile
     document.addEventListener('touchmove', (e) => {
       const touch = e.touches[0];
       if (!touch) return;
@@ -504,8 +508,6 @@
       title.style.transform = `translate(${x*0.1}px, ${y*0.08}px)`;
     }, { passive: true });
   }
-
-  console.log('ServerLarp · Globe prêt');
 </script>
 
 </body>
