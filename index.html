@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>ServerLarp · OSINT & outils</title>
+  <title>ServerLarp</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
@@ -76,6 +76,7 @@
       position: relative;
       min-height: 100svh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       overflow: hidden;
@@ -88,14 +89,12 @@
       background-size: 34px 34px;
     }
     .globe-wrap {
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      pointer-events: none;
+      position: relative;
       width: min(600px, 85vw);
       height: min(600px, 85vw);
       max-width: 600px;
       max-height: 600px;
+      margin: 0 auto;
     }
     #globeCanvas {
       display: block;
@@ -106,41 +105,61 @@
       touch-action: none;
     }
 
+    .globe-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+      width: 85%;
+    }
+    .globe-content h1 {
+      font-family: 'Big Shoulders', sans-serif;
+      font-size: clamp(2.5rem, 10vw, 6rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
+    .globe-content .subtitle-globe {
+      font-size: clamp(0.7rem, 1.5vw, 0.95rem);
+      color: var(--dim);
+      margin-top: 8px;
+      text-shadow: 0 2px 20px rgba(0,0,0,0.8);
+    }
+
     .stage {
       position: relative;
       z-index: 5;
       text-align: center;
       pointer-events: none;
+      margin-top: 30px;
     }
     .stage * { pointer-events: auto; }
-    .title-3d {
-      font-size: clamp(3.5rem, 13vw, 9.5rem);
-      font-weight: 900;
-      line-height: 0.9;
-      letter-spacing: -0.01em;
-      display: inline-block;
-    }
-    .subtitle {
-      margin-top: 18px;
-      font-size: clamp(0.8rem, 1.8vw, 0.95rem);
-      color: var(--dim);
-    }
+
     .cta {
-      margin-top: 30px;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      padding: 12px 24px;
-      background: transparent;
-      border: 1px solid var(--line);
-      color: var(--text);
+      padding: 14px 32px;
+      background: #5865F2;
+      border: none;
+      color: #fff;
       font-weight: 700;
-      font-size: clamp(0.75rem, 1.5vw, 0.85rem);
-      border-radius: 3px;
-      transition: border-color 0.3s ease, color 0.3s ease;
+      font-size: clamp(0.8rem, 1.5vw, 1rem);
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 25px rgba(88, 101, 242, 0.35);
+      letter-spacing: 0.5px;
     }
-    .cta:hover { border-color: var(--red-2); color: var(--red-2); }
-    .cta svg { width: 18px; height: 18px; fill: currentColor; }
+    .cta:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 8px 40px rgba(88, 101, 242, 0.5);
+      background: #4752c4;
+    }
+    .cta svg { width: 20px; height: 20px; fill: currentColor; }
 
     .scroll-hint {
       position: absolute;
@@ -182,7 +201,6 @@
       margin: 0;
     }
 
-    /* --- Section Outils Web --- */
     .tools-section {
       position: relative;
       z-index: 5;
@@ -314,6 +332,7 @@
       .bottom-cta { padding: 0 4vw 50px; }
       .card { padding: 20px 16px; }
       .tool-card { padding: 18px 16px; }
+      .stage { margin-top: 20px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -330,17 +349,23 @@
 
 <section class="hero">
   <div class="dots"></div>
+  
   <div class="globe-wrap">
     <canvas id="globeCanvas"></canvas>
+    <!-- Texte centré sur le globe -->
+    <div class="globe-content">
+      <h1 class="brand-gradient">ServerLarp</h1>
+      <div class="subtitle-globe">OSINT, outils et ebooks, sur Discord.</div>
+    </div>
   </div>
+
   <div class="stage">
-    <h1 class="title-3d brand-gradient">ServerLarp</h1>
-    <div class="subtitle">OSINT, outils et ebooks, sur Discord.</div>
     <a class="cta" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
       <svg viewBox="0 0 23 23"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
       Rejoindre le Discord
     </a>
   </div>
+  
   <div class="scroll-hint">Défiler</div>
 </section>
 
@@ -352,12 +377,10 @@
   </div>
 </section>
 
-<!-- Section Outils Web -->
 <section class="tools-section">
   <h2>Outils disponibles sur le web</h2>
   <p class="section-desc">Les meilleurs moteurs de recherche OSINT du moment, accessibles directement en ligne.</p>
   <div class="tools-grid">
-    <!-- Tool 1 -->
     <div class="tool-card">
       <span class="tool-badge web">🌐 Web</span>
       <div class="tool-name">Leak.fun</div>
@@ -367,7 +390,6 @@
         Accéder
       </a>
     </div>
-    <!-- Tool 2 - Pokedox -->
     <div class="tool-card">
       <span class="tool-badge web">🌐 Web</span>
       <div class="tool-name">Pokedox</div>
@@ -377,7 +399,6 @@
         Accéder
       </a>
     </div>
-    <!-- Tool 3 -->
     <div class="tool-card">
       <span class="tool-badge web">🌐 Web</span>
       <div class="tool-name">Kerbes</div>
@@ -404,7 +425,6 @@
   <a href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">discord.gg/5H9yJTQEE5</a>
 </footer>
 
-<!-- Three.js - Globe épuré -->
 <script type="importmap">
   {
     "imports": {
@@ -611,22 +631,6 @@
   }
 
   animate();
-
-  const title = document.getElementById('title3d');
-  if (title) {
-    document.addEventListener('mousemove', (e) => {
-      const x = (e.clientX / window.innerWidth - 0.5) * 4;
-      const y = (e.clientY / window.innerHeight - 0.5) * 3;
-      title.style.transform = `translate(${x*0.15}px, ${y*0.1}px)`;
-    });
-    document.addEventListener('touchmove', (e) => {
-      const touch = e.touches[0];
-      if (!touch) return;
-      const x = (touch.clientX / window.innerWidth - 0.5) * 4;
-      const y = (touch.clientY / window.innerHeight - 0.5) * 3;
-      title.style.transform = `translate(${x*0.1}px, ${y*0.08}px)`;
-    }, { passive: true });
-  }
 </script>
 
 </body>
