@@ -1,592 +1,490 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ServerLarp</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@500;700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --black: #0a0a0b;
-    --charcoal: #141416;
-    --panel: #1b1b1d;
-    --paper: #d9d0b8;
-    --paper-dim: #a89f89;
-    --red: #a4241c;
-    --red-bright: #d6402f;
-    --amber: #c99a4b;
-    --teal: #3a4441;
-    --line: rgba(217,208,184,0.14);
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ServerLarp · OSINT & outils</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    /* --- reset & base --- */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: radial-gradient(ellipse 90% 60% at 50% 20%, #0e1013, #08090b 65%);
+      color: #d8d5cd;
+      font-family: 'JetBrains Mono', monospace;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+    ::selection { background: #b8342a; color: #fff; }
+    a { color: inherit; text-decoration: none; }
 
-  *{ box-sizing: border-box; }
+    :root {
+      --bg: #08090b;
+      --bg-2: #0e1013;
+      --text: #d8d5cd;
+      --dim: #7d8188;
+      --red-2: #e0483a;
+      --line: rgba(216,213,205,0.08);
+    }
 
-  html{ scroll-behavior: smooth; }
+    h1, h2 {
+      font-family: 'Big Shoulders', sans-serif;
+      margin: 0;
+    }
 
-  body{
-    margin:0;
-    background: var(--black);
-    color: var(--paper);
-    font-family: 'JetBrains Mono', monospace;
-    overflow-x: hidden;
-  }
+    /* --- header --- */
+    header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 26px 6vw;
+      pointer-events: none;
+    }
+    header * { pointer-events: auto; }
+    .logo {
+      font-family: 'Big Shoulders', sans-serif;
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: 0.02em;
+    }
+    .brand-gradient {
+      background: linear-gradient(100deg, #ff8a1e 0%, #ffc93f 22%, #fff7dd 42%, #ffffff 50%, #fff7dd 58%, #ffc93f 78%, #ff8a1e 100%);
+      background-size: 220% 100%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: brandShine 5s linear infinite;
+    }
+    @keyframes brandShine {
+      to { background-position: -220% 0; }
+    }
+    .nav-btn {
+      padding: 10px 20px;
+      border: 1px solid var(--line);
+      font-size: 0.78rem;
+      color: var(--text);
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .nav-btn:hover { border-color: var(--red-2); color: var(--red-2); }
 
-  ::selection{ background: var(--red); color: var(--paper); }
+    /* --- hero --- */
+    .hero {
+      position: relative;
+      min-height: 100svh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .dots {
+      position: absolute;
+      inset: -10%;
+      background-image: radial-gradient(rgba(216,213,205,0.12) 1px, transparent 1px);
+      background-size: 34px 34px;
+    }
+    .globe-wrap {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(0 40px 70px rgba(0,0,0,0.6));
+      pointer-events: none;
+    }
+    #globeCanvas {
+      display: block;
+      width: min(640px, 88vw);
+      height: min(640px, 88vw);
+      opacity: 0.92;
+      border-radius: 50%;
+    }
 
-  h1,h2,h3{
-    font-family: 'Big Shoulders Stencil', sans-serif;
-    margin: 0;
-    letter-spacing: 0.02em;
-  }
+    .stage {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+    }
+    .title-3d {
+      font-size: clamp(4rem, 13vw, 9.5rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      display: inline-block;
+    }
+    .subtitle {
+      margin-top: 22px;
+      font-size: 0.95rem;
+      color: var(--dim);
+    }
+    .cta {
+      margin-top: 40px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px 30px;
+      background: transparent;
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 0.85rem;
+      border-radius: 3px;
+      transition: border-color 0.3s ease, color 0.3s ease;
+    }
+    .cta:hover { border-color: var(--red-2); color: var(--red-2); }
+    .cta svg { width: 18px; height: 18px; fill: currentColor; }
 
-  a{ color: inherit; }
+    .scroll-hint {
+      position: absolute;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.68rem;
+      color: var(--dim);
+      z-index: 5;
+    }
 
-  /* ---------- scanline / grid backdrop ---------- */
-  .grid-bg{
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    background-image:
-      linear-gradient(var(--line) 1px, transparent 1px),
-      linear-gradient(90deg, var(--line) 1px, transparent 1px);
-    background-size: 46px 46px;
-    background-position: center;
-    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 75%);
-    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 75%);
-    pointer-events: none;
-  }
+    /* --- features --- */
+    .features {
+      position: relative;
+      z-index: 5;
+      padding: 110px 6vw 130px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    @media (max-width: 820px) {
+      .features-grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: transparent;
+      border: 1px solid var(--line);
+      padding: 34px 28px;
+      transition: border-color 0.3s ease;
+    }
+    .card:hover { border-color: var(--red-2); }
+    .card h2 {
+      font-size: 1.5rem;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .card p {
+      font-size: 0.85rem;
+      color: var(--dim);
+      line-height: 1.6;
+      margin: 0;
+    }
 
-  .scanline{
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-    pointer-events: none;
-    background: repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,0.025) 0px,
-      rgba(255,255,255,0.025) 1px,
-      transparent 1px,
-      transparent 3px
-    );
-    mix-blend-mode: overlay;
-  }
+    /* --- bottom cta --- */
+    .bottom-cta {
+      position: relative;
+      z-index: 5;
+      text-align: center;
+      padding: 0 6vw 120px;
+    }
+    .bottom-cta p {
+      color: var(--dim);
+      font-size: 0.9rem;
+      max-width: 460px;
+      margin: 0 auto 26px;
+      line-height: 1.6;
+    }
 
-  .noise-vignette{
-    position: fixed;
-    inset:0;
-    z-index: 2;
-    pointer-events:none;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
-  }
-
-  /* ---------- header ---------- */
-  header{
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 50;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    padding: 22px 42px;
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-    color: var(--paper-dim);
-    background: linear-gradient(to bottom, rgba(10,10,11,0.9), transparent);
-  }
-  header .tag{ color: var(--red-bright); }
-  #clock{ font-variant-numeric: tabular-nums; }
-
-  /* ---------- hero ---------- */
-  .hero{
-    position: relative;
-    min-height: 100svh;
-    display:flex;
-    flex-direction: column;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    z-index: 5;
-    perspective: 1200px;
-    padding: 120px 20px 60px;
-  }
-
-  .globe-wrap{
-    position:absolute;
-    top: 50%; left:50%;
-    width: 560px; height: 560px;
-    transform: translate(-50%,-55%);
-    z-index: 0;
-    opacity: 0.55;
-    pointer-events:none;
-  }
-  .globe{
-    position:relative;
-    width:100%; height:100%;
-    transform-style: preserve-3d;
-    animation: spin 34s linear infinite;
-  }
-  .ring{
-    position:absolute;
-    inset:0;
-    border: 1px solid rgba(201,154,75,0.35);
-    border-radius: 50%;
-  }
-  .ring:nth-child(1){ transform: rotateY(0deg); }
-  .ring:nth-child(2){ transform: rotateY(30deg); }
-  .ring:nth-child(3){ transform: rotateY(60deg); }
-  .ring:nth-child(4){ transform: rotateY(90deg); }
-  .ring:nth-child(5){ transform: rotateX(60deg); border-color: rgba(164,36,28,0.4); }
-  .ring:nth-child(6){ transform: rotateX(30deg); border-color: rgba(164,36,28,0.25); }
-  @keyframes spin{
-    from{ transform: rotateY(0deg) rotateX(8deg); }
-    to{ transform: rotateY(360deg) rotateX(8deg); }
-  }
-
-  .sweep{
-    position:absolute;
-    top:50%; left:50%;
-    width: 620px; height:620px;
-    transform: translate(-50%,-50%);
-    border-radius:50%;
-    background: conic-gradient(from 0deg, rgba(164,36,28,0.5), transparent 26%);
-    animation: rotateSweep 5s linear infinite;
-    z-index: -1;
-    mix-blend-mode: screen;
-  }
-  @keyframes rotateSweep{ to{ transform: translate(-50%,-50%) rotate(360deg); } }
-
-  .eyebrow-code{
-    font-size: 0.75rem;
-    letter-spacing: 0.3em;
-    color: var(--red-bright);
-    margin-bottom: 22px;
-    z-index: 2;
-  }
-
-  .title-stack{
-    position:relative;
-    z-index: 3;
-    transform-style: preserve-3d;
-  }
-
-  .title-main{
-    font-size: clamp(4.2rem, 14vw, 10.5rem);
-    line-height: 0.86;
-    font-weight: 900;
-    color: var(--paper);
-    text-shadow: 0 0 60px rgba(0,0,0,0.6);
-    position: relative;
-    display:inline-block;
-  }
-
-  .redact-bar{
-    position:absolute;
-    top:0; left:0;
-    height:100%; width:100%;
-    background: var(--red);
-    transform-origin: left;
-    animation: wipe 1.6s cubic-bezier(.77,0,.18,1) forwards;
-  }
-  @keyframes wipe{
-    0%{ transform: scaleX(1); }
-    55%{ transform: scaleX(1); }
-    100%{ transform: scaleX(0); }
-  }
-
-  .subtitle{
-    margin-top: 26px;
-    font-size: 0.95rem;
-    letter-spacing: 0.08em;
-    color: var(--paper-dim);
-    z-index: 3;
-    position:relative;
-  }
-  .subtitle .sep{ color: var(--red-bright); margin: 0 10px; }
-
-  .join-btn{
-    margin-top: 46px;
-    z-index: 3;
-    position: relative;
-    display:inline-flex;
-    align-items:center;
-    gap: 12px;
-    padding: 16px 34px;
-    background: transparent;
-    border: 2px solid var(--red-bright);
-    color: var(--paper);
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.12em;
-    text-decoration:none;
-    transform: rotate(-1.5deg);
-    transition: transform 0.35s ease, background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
-    box-shadow: 0 0 0 rgba(214,64,47,0);
-  }
-  .join-btn:hover{
-    transform: rotate(0deg) scale(1.04);
-    background: var(--red-bright);
-    color: var(--black);
-    box-shadow: 0 10px 40px rgba(214,64,47,0.35);
-  }
-  .join-btn svg{ width:18px; height:18px; fill: currentColor; }
-
-  .status-line{
-    margin-top: 20px;
-    font-size: 0.68rem;
-    color: var(--paper-dim);
-    letter-spacing: 0.1em;
-    z-index: 3;
-    position: relative;
-  }
-  .status-line span{ color: var(--amber); }
-
-  .scroll-cue{
-    position:absolute;
-    bottom: 34px;
-    left:50%;
-    transform: translateX(-50%);
-    font-size: 0.65rem;
-    letter-spacing: 0.25em;
-    color: var(--paper-dim);
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:8px;
-    z-index: 3;
-  }
-  .scroll-cue .bar{
-    width:1px; height: 40px;
-    background: linear-gradient(to bottom, var(--red-bright), transparent);
-    animation: dropline 1.8s ease-in-out infinite;
-  }
-  @keyframes dropline{
-    0%{ transform: scaleY(0); transform-origin: top; }
-    50%{ transform: scaleY(1); transform-origin: top; }
-    51%{ transform: scaleY(1); transform-origin: bottom; }
-    100%{ transform: scaleY(0); transform-origin: bottom; }
-  }
-
-  /* ---------- section shared ---------- */
-  section{
-    position: relative;
-    z-index: 5;
-    padding: 120px 6vw;
-  }
-  .section-head{
-    display:flex;
-    align-items: baseline;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 18px;
-    margin-bottom: 60px;
-    flex-wrap: wrap;
-    gap: 14px;
-  }
-  .section-head h2{
-    font-size: clamp(2.4rem, 5vw, 3.6rem);
-    color: var(--paper);
-  }
-  .section-head .ref{
-    font-size: 0.72rem;
-    color: var(--red-bright);
-    letter-spacing: 0.15em;
-  }
-
-  /* ---------- dossiers / folders ---------- */
-  .dossiers{
-    display:grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 48px;
-    perspective: 1600px;
-  }
-  @media (max-width: 860px){
-    .dossiers{ grid-template-columns: 1fr; }
-  }
-
-  .folder{
-    position:relative;
-    transform-style: preserve-3d;
-    min-height: 420px;
-  }
-
-  .folder-body{
-    position: relative;
-    background: var(--panel);
-    border: 1px solid var(--line);
-    padding: 34px 30px 30px;
-    height: 100%;
-    transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(.2,.9,.3,1), box-shadow 0.6s ease;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.35);
-  }
-  .folder:hover .folder-body{
-    transform: rotateX(4deg) rotateY(-3deg) translateY(-8px);
-    box-shadow: 0 50px 90px rgba(0,0,0,0.55);
-  }
-
-  .folder-tab{
-    position:absolute;
-    top: -22px; left: 30px;
-    background: var(--amber);
-    color: var(--black);
-    font-family: 'Big Shoulders Stencil', sans-serif;
-    font-weight: 700;
-    font-size: 0.85rem;
-    letter-spacing: 0.1em;
-    padding: 6px 18px 8px;
-    transform: translateZ(20px);
-  }
-
-  .folder-body h3{
-    font-size: 2.1rem;
-    color: var(--paper);
-    margin-bottom: 8px;
-  }
-  .folder-meta{
-    font-size: 0.7rem;
-    color: var(--paper-dim);
-    letter-spacing: 0.08em;
-    margin-bottom: 24px;
-    border-bottom: 1px dashed var(--line);
-    padding-bottom: 18px;
-  }
-
-  .item-row{
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 14px;
-    padding: 13px 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.85rem;
-  }
-  .item-row:last-of-type{ border-bottom: none; }
-  .item-name{ color: var(--paper); }
-  .item-name .num{ color: var(--paper-dim); margin-right: 10px; }
-
-  .badge{
-    font-size: 0.62rem;
-    letter-spacing: 0.08em;
-    padding: 4px 10px;
-    border: 1px solid currentColor;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  .badge.online{ color: #7ea67a; }
-  .badge.dl{ color: var(--red-bright); }
-
-  .folder-note{
-    margin-top: 22px;
-    font-size: 0.72rem;
-    color: var(--paper-dim);
-    line-height: 1.6;
-    border-left: 2px solid var(--red);
-    padding-left: 14px;
-  }
-
-  /* ---------- discord panel ---------- */
-  .discord-panel{
-    margin-top: 90px;
-    position: relative;
-    border: 1px solid var(--line);
-    background: linear-gradient(135deg, rgba(164,36,28,0.06), transparent 60%), var(--charcoal);
-    padding: 54px 6vw;
-    display:flex;
-    align-items:center;
-    justify-content: space-between;
-    gap: 40px;
-    flex-wrap: wrap;
-  }
-  .discord-panel h3{
-    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
-    max-width: 640px;
-    line-height: 1.15;
-  }
-  .discord-panel p{
-    color: var(--paper-dim);
-    font-size: 0.85rem;
-    max-width: 560px;
-    line-height: 1.7;
-    margin-top: 14px;
-  }
-
-  /* ---------- footer ---------- */
-  footer{
-    position: relative;
-    z-index: 5;
-    padding: 50px 6vw 40px;
-    border-top: 1px solid var(--line);
-    display:flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 18px;
-    font-size: 0.68rem;
-    color: var(--paper-dim);
-    letter-spacing: 0.08em;
-  }
-  footer .brand{ color: var(--paper); font-family: 'Big Shoulders Stencil', sans-serif; font-size: 1.1rem; letter-spacing: 0.05em; }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ animation: none !important; transition: none !important; }
-  }
-</style>
+    /* --- footer --- */
+    footer {
+      position: relative;
+      z-index: 5;
+      border-top: 1px solid var(--line);
+      padding: 30px 6vw;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.72rem;
+      color: var(--dim);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { animation: none !important; transition: none !important; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="grid-bg"></div>
-<div class="scanline"></div>
-<div class="noise-vignette"></div>
-
 <header>
-  <div>SERVERLARP <span class="tag">// ACCÈS RESTREINT</span></div>
-  <div id="clock">--:--:--</div>
+  <div class="logo brand-gradient">ServerLarp</div>
+  <a class="nav-btn" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">Rejoindre</a>
 </header>
 
-<section class="hero" id="top">
+<section class="hero">
+  <div class="dots"></div>
   <div class="globe-wrap">
-    <div class="sweep"></div>
-    <div class="globe">
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-      <div class="ring"></div>
-    </div>
+    <canvas id="globeCanvas" width="800" height="800"></canvas>
   </div>
-
-  <div class="title-stack" id="tiltTitle">
-    <h1 class="title-main">SERVERLARP<span class="redact-bar"></span></h1>
-  </div>
-
-  <div class="subtitle">RENSEIGNEMENT <span class="sep">/</span> OUTILS <span class="sep">/</span> RESSOURCES <span class="sep">/</span> COMMUNAUTÉ OSINT</div>
-
-  <a class="join-btn" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
-    <svg viewBox="0 0 24 24"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
-    REJOINDRE LE SERVEUR
-  </a>
-
-  <div class="status-line">STATUT DU DISCORD : <span>OUVERT</span><span id="sync">2</span> MIN</div>
-
-  <div class="scroll-cue"><div class="bar"></div>DÉFILER</div>
-</section>
-
-<section id="dossiers-section">
-  <div class="section-head">
-    <h2>Dossiers</h2>
-    <div class="ref">ARCHIVE — ACCÈS PARTIEL EN LIGNE</div>
-  </div>
-
-  <div class="dossiers">
-
-    <div class="folder">
-      <div class="folder-tab">DOSSIER 01 — EBOOKS</div>
-      <div class="folder-body">
-        <h3>eBooks</h3>
-        <div class="folder-meta">Extrait de l'archive</div>
-
-        <div class="item-row">
-          <span class="item-name"><span class="num">01</span>Guide d'introduction à l'OSINT</span>
-          <span class="badge online">EN LIGNE</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">02</span>Cartographie des identités numériques</span>
-          <span class="badge online">EN LIGNE</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">03</span>Méthodologie de vérification des sources</span>
-          <span class="badge dl">DISCORD UNIQUEMENT</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">04</span>Compendium — recherche par image inversée</span>
-          <span class="badge dl">DISCORD UNIQUEMENT</span>
-        </div>
-
-        <div class="folder-note">
-          Bibliothèque complète disponible dans la catégorie Ebooks du Discord. Les fichiers marqués « Discord uniquement » sont distribués directement sur le serveur.
-        </div>
-      </div>
-    </div>
-
-    <div class="folder">
-      <div class="folder-tab">DOSSIER 02 — TOOLS</div>
-      <div class="folder-body">
-        <h3>Tools</h3>
-        <div class="folder-meta">Aperçu — la moitié de l'arsenal reste sur Discord</div>
-
-        <div class="item-row">
-          <span class="item-name"><span class="num">01</span>Recon Scanner — cartographie de surface</span>
-          <span class="badge online">EN LIGNE</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">02</span>Username Tracker</span>
-          <span class="badge online">EN LIGNE</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">03</span>Metadata Extractor</span>
-          <span class="badge dl">DISCORD UNIQUEMENT</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">04</span>IP Geolocator Lite</span>
-          <span class="badge dl">DISCORD UNIQUEMENT</span>
-        </div>
-        <div class="item-row">
-          <span class="item-name"><span class="num">05</span>+ 12 autres outils</span>
-          <span class="badge dl">DISCORD UNIQUEMENT</span>
-        </div>
-
-        <div class="folder-note">
-          Les outils marqués « téléchargement » nécessitent de récupérer un fichier fourni sur le serveur avant utilisation. Le reste de la boîte à outils — non listé ici — est exclusivement accessible dans le salon #tools du Discord.
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <div class="discord-panel">
-    <div>
-      <h3>Le reste du dossier est sur Discord.</h3>
-      <p>ServerLarp est avant tout un serveur Discord : OSINT, outils, eBooks, entraide et veille. Ce site n'affiche qu'un extrait de l'archive. Rejoins le serveur pour accéder à l'intégralité des salons, des fichiers et des mises à jour.</p>
-    </div>
-    <a class="join-btn" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
+  <div class="stage">
+    <h1 class="title-3d brand-gradient">ServerLarp</h1>
+    <div class="subtitle">OSINT, outils et ebooks, sur Discord.</div>
+    <a class="cta" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
-      ACCÉDER AU SERVEUR
+      Rejoindre le Discord
     </a>
   </div>
+  <div class="scroll-hint">Défiler</div>
 </section>
 
-<script>
-  // live clock
-  function tick(){
-    const d = new Date();
-    document.getElementById('clock').textContent = d.toLocaleTimeString('fr-FR');
+<section class="features">
+  <div class="features-grid">
+    <div class="card"><h2>OSINT</h2><p>Des méthodes et des retours d'expérience pour la recherche en sources ouvertes.</p></div>
+    <div class="card"><h2>Outils</h2><p>Une sélection d'outils utiles. Certains se lancent en ligne, d'autres demandent de télécharger un fichier.</p></div>
+    <div class="card"><h2>Ebooks</h2><p>Des guides et des lectures partagés directement sur le serveur.</p></div>
+  </div>
+</section>
+
+<section class="bottom-cta">
+  <p>Tout se passe sur Discord. Rejoins le serveur pour accéder aux salons, aux outils et aux ebooks.</p>
+  <a class="cta" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
+    Rejoindre le Discord
+  </a>
+</section>
+
+<footer>
+  <div style="font-family:'Big Shoulders', sans-serif; font-weight:800; font-size:1rem; color: var(--text);">ServerLarp</div>
+  <a href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">discord.gg/5H9yJTQEE5</a>
+</footer>
+
+<!-- Globe propre avec Three.js (léger, moderne) -->
+<script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+    }
   }
-  tick();
-  setInterval(tick, 1000);
+</script>
 
-  document.getElementById('footDate').textContent = new Date().toLocaleDateString('fr-FR');
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 
-  // fake sync counter, purely decorative
-  let syncMin = 2;
-  setInterval(() => {
-    syncMin = (syncMin % 9) + 1;
-    document.getElementById('sync').textContent = syncMin;
-  }, 8000);
+  const canvas = document.getElementById('globeCanvas');
+  const container = canvas.parentElement;
 
-  // mouse parallax on hero title/globe
-  const hero = document.getElementById('top');
-  const title = document.getElementById('tiltTitle');
-  const globe = document.querySelector('.globe-wrap');
-  hero.addEventListener('mousemove', (e) => {
-    const x = (e.clientX / window.innerWidth - 0.5);
-    const y = (e.clientY / window.innerHeight - 0.5);
-    title.style.transform = `rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
-    globe.style.transform = `translate(calc(-50% + ${x * 24}px), calc(-55% + ${y * 24}px))`;
+  // -- scene --
+  const scene = new THREE.Scene();
+  scene.background = null; // transparent
+
+  // -- camera --
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+  camera.position.set(0, 0.5, 3.5);
+
+  // -- renderer (avec transparence) --
+  const renderer = new THREE.WebGLRenderer({
+    canvas,
+    alpha: true,
+    antialias: true,
+    preserveDrawingBuffer: true,
   });
-  hero.addEventListener('mouseleave', () => {
-    title.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(800, 800);
+
+  // -- lights --
+  const ambient = new THREE.AmbientLight(0x404060);
+  scene.add(ambient);
+
+  const dirLight = new THREE.DirectionalLight(0xffeedd, 1.2);
+  dirLight.position.set(1, 2, 3);
+  scene.add(dirLight);
+
+  const backLight = new THREE.DirectionalLight(0x4488ff, 0.6);
+  backLight.position.set(-2, -1, -3);
+  scene.add(backLight);
+
+  // -- globe (spherical avec texture générée propre) --
+  const geometry = new THREE.SphereGeometry(1.2, 64, 64);
+
+  // texture canvas pour un look "techno / OSINT"
+  const texCanvas = document.createElement('canvas');
+  texCanvas.width = 1024;
+  texCanvas.height = 512;
+  const ctx = texCanvas.getContext('2d');
+
+  // fond sombre
+  ctx.fillStyle = '#0a0c10';
+  ctx.fillRect(0, 0, 1024, 512);
+
+  // grille fine
+  ctx.strokeStyle = 'rgba(100, 140, 200, 0.20)';
+  ctx.lineWidth = 0.6;
+  for (let i = 0; i <= 36; i++) {
+    const x = (i / 36) * 1024;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 512);
+    ctx.stroke();
+  }
+  for (let i = 0; i <= 18; i++) {
+    const y = (i / 18) * 512;
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(1024, y);
+    ctx.stroke();
+  }
+
+  // traits de latitude / longitude plus marqués (comme un globe stylisé)
+  ctx.strokeStyle = 'rgba(180, 200, 240, 0.25)';
+  ctx.lineWidth = 1.2;
+  for (let i = 0; i < 12; i++) {
+    const angle = (i / 12) * Math.PI * 2;
+    const cx = 512 + 400 * Math.cos(angle);
+    const cy = 256 + 200 * Math.sin(angle);
+    ctx.beginPath();
+    ctx.ellipse(512, 256, 400, 200, 0, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+
+  // continents simplifiés (formes abstraites)
+  ctx.fillStyle = 'rgba(60, 120, 200, 0.25)';
+  ctx.strokeStyle = 'rgba(140, 190, 255, 0.5)';
+  ctx.lineWidth = 1.5;
+
+  // Amérique du Nord
+  ctx.beginPath();
+  ctx.ellipse(280, 180, 80, 60, -0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Amérique du Sud
+  ctx.beginPath();
+  ctx.ellipse(300, 320, 40, 70, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Europe / Afrique
+  ctx.beginPath();
+  ctx.ellipse(550, 200, 60, 80, 0.3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.ellipse(560, 310, 45, 70, -0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Asie
+  ctx.beginPath();
+  ctx.ellipse(750, 180, 90, 60, 0.1, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // Australie
+  ctx.beginPath();
+  ctx.ellipse(820, 380, 35, 30, 0.2, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.stroke();
+
+  // quelques points lumineux (villes)
+  ctx.fillStyle = 'rgba(255, 200, 100, 0.6)';
+  const dots = [[280,180], [300,320], [550,200], [560,310], [750,180], [820,380], [400,150], [650,120], [200,280]];
+  dots.forEach(([x,y]) => {
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // texture
+  const texture = new THREE.CanvasTexture(texCanvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(1, 1);
+
+  const material = new THREE.MeshPhongMaterial({
+    map: texture,
+    transparent: true,
+    opacity: 0.9,
+    emissive: new THREE.Color(0x1a2a3a),
+    emissiveIntensity: 0.25,
+    shininess: 30,
+    side: THREE.DoubleSide,
+  });
+
+  const globe = new THREE.Mesh(geometry, material);
+  scene.add(globe);
+
+  // -- anneau orbital (décor) --
+  const ringGeo = new THREE.TorusGeometry(1.7, 0.012, 32, 128);
+  const ringMat = new THREE.MeshStandardMaterial({
+    color: 0x6699cc,
+    emissive: 0x224466,
+    transparent: true,
+    opacity: 0.25,
+    side: THREE.DoubleSide,
+  });
+  const ring = new THREE.Mesh(ringGeo, ringMat);
+  ring.rotation.x = Math.PI / 2.8;
+  ring.rotation.z = 0.3;
+  scene.add(ring);
+
+  const ring2 = new THREE.Mesh(
+    new THREE.TorusGeometry(1.9, 0.006, 16, 128),
+    new THREE.MeshStandardMaterial({ color: 0x88aadd, emissive: 0x112244, transparent: true, opacity: 0.15, side: THREE.DoubleSide })
+  );
+  ring2.rotation.x = Math.PI / 1.8;
+  ring2.rotation.z = -0.5;
+  scene.add(ring2);
+
+  // -- contrôle de la souris (rotation douce) --
+  let mouseX = 0, mouseY = 0;
+  let targetRotX = 0, targetRotY = 0;
+
+  document.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX = x * 0.6;
+    mouseY = y * 0.3;
+  });
+
+  // -- resize --
+  const resize = () => {
+    const size = Math.min(container.clientWidth, container.clientHeight);
+    const w = size;
+    const h = size;
+    renderer.setSize(w, h, false);
+    camera.aspect = 1;
+    camera.updateProjectionMatrix();
+  };
+  window.addEventListener('resize', resize);
+  resize();
+
+  // -- animation --
+  function animate() {
+    requestAnimationFrame(animate);
+
+    // rotation fluide
+    targetRotX += (mouseX - targetRotX) * 0.05;
+    targetRotY += (mouseY - targetRotY) * 0.05;
+
+    globe.rotation.y += 0.0018 + targetRotX * 0.008;
+    globe.rotation.x += targetRotY * 0.005;
+    globe.rotation.x = Math.max(-0.6, Math.min(0.6, globe.rotation.x));
+
+    ring.rotation.y += 0.0008;
+    ring2.rotation.y -= 0.0012;
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+
+  // petit effet de parallaxe sur le titre (optionnel)
+  const title = document.getElementById('title3d');
+  document.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5) * 6;
+    const y = (e.clientY / window.innerHeight - 0.5) * 4;
+    title.style.transform = `translate(${x*0.3}px, ${y*0.2}px)`;
   });
 </script>
 
