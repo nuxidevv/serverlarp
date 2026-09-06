@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ServerLarp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Stencil:wght@500;700;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --black: #0a0a0b;
+    --charcoal: #141416;
+    --panel: #1b1b1d;
+    --paper: #d9d0b8;
+    --paper-dim: #a89f89;
+    --red: #a4241c;
+    --red-bright: #d6402f;
+    --amber: #c99a4b;
+    --teal: #3a4441;
+    --line: rgba(217,208,184,0.14);
+  }
+
+  *{ box-sizing: border-box; }
+
+  html{ scroll-behavior: smooth; }
+
+  body{
+    margin:0;
+    background: var(--black);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    overflow-x: hidden;
+  }
+
+  ::selection{ background: var(--red); color: var(--paper); }
+
+  h1,h2,h3{
+    font-family: 'Big Shoulders Stencil', sans-serif;
+    margin: 0;
+    letter-spacing: 0.02em;
+  }
+
+  a{ color: inherit; }
+
+  /* ---------- scanline / grid backdrop ---------- */
+  .grid-bg{
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 46px 46px;
+    background-position: center;
+    -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 75%);
+    mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, black 20%, transparent 75%);
+    pointer-events: none;
+  }
+
+  .scanline{
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      to bottom,
+      rgba(255,255,255,0.025) 0px,
+      rgba(255,255,255,0.025) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+    mix-blend-mode: overlay;
+  }
+
+  .noise-vignette{
+    position: fixed;
+    inset:0;
+    z-index: 2;
+    pointer-events:none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.75) 100%);
+  }
+
+  /* ---------- header ---------- */
+  header{
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    padding: 22px 42px;
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+    color: var(--paper-dim);
+    background: linear-gradient(to bottom, rgba(10,10,11,0.9), transparent);
+  }
+  header .tag{ color: var(--red-bright); }
+  #clock{ font-variant-numeric: tabular-nums; }
+
+  /* ---------- hero ---------- */
+  .hero{
+    position: relative;
+    min-height: 100svh;
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    z-index: 5;
+    perspective: 1200px;
+    padding: 120px 20px 60px;
+  }
+
+  .globe-wrap{
+    position:absolute;
+    top: 50%; left:50%;
+    width: 560px; height: 560px;
+    transform: translate(-50%,-55%);
+    z-index: 0;
+    opacity: 0.55;
+    pointer-events:none;
+  }
+  .globe{
+    position:relative;
+    width:100%; height:100%;
+    transform-style: preserve-3d;
+    animation: spin 34s linear infinite;
+  }
+  .ring{
+    position:absolute;
+    inset:0;
+    border: 1px solid rgba(201,154,75,0.35);
+    border-radius: 50%;
+  }
+  .ring:nth-child(1){ transform: rotateY(0deg); }
+  .ring:nth-child(2){ transform: rotateY(30deg); }
+  .ring:nth-child(3){ transform: rotateY(60deg); }
+  .ring:nth-child(4){ transform: rotateY(90deg); }
+  .ring:nth-child(5){ transform: rotateX(60deg); border-color: rgba(164,36,28,0.4); }
+  .ring:nth-child(6){ transform: rotateX(30deg); border-color: rgba(164,36,28,0.25); }
+  @keyframes spin{
+    from{ transform: rotateY(0deg) rotateX(8deg); }
+    to{ transform: rotateY(360deg) rotateX(8deg); }
+  }
+
+  .sweep{
+    position:absolute;
+    top:50%; left:50%;
+    width: 620px; height:620px;
+    transform: translate(-50%,-50%);
+    border-radius:50%;
+    background: conic-gradient(from 0deg, rgba(164,36,28,0.5), transparent 26%);
+    animation: rotateSweep 5s linear infinite;
+    z-index: -1;
+    mix-blend-mode: screen;
+  }
+  @keyframes rotateSweep{ to{ transform: translate(-50%,-50%) rotate(360deg); } }
+
+  .eyebrow-code{
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--red-bright);
+    margin-bottom: 22px;
+    z-index: 2;
+  }
+
+  .title-stack{
+    position:relative;
+    z-index: 3;
+    transform-style: preserve-3d;
+  }
+
+  .title-main{
+    font-size: clamp(4.2rem, 14vw, 10.5rem);
+    line-height: 0.86;
+    font-weight: 900;
+    color: var(--paper);
+    text-shadow: 0 0 60px rgba(0,0,0,0.6);
+    position: relative;
+    display:inline-block;
+  }
+
+  .redact-bar{
+    position:absolute;
+    top:0; left:0;
+    height:100%; width:100%;
+    background: var(--red);
+    transform-origin: left;
+    animation: wipe 1.6s cubic-bezier(.77,0,.18,1) forwards;
+  }
+  @keyframes wipe{
+    0%{ transform: scaleX(1); }
+    55%{ transform: scaleX(1); }
+    100%{ transform: scaleX(0); }
+  }
+
+  .subtitle{
+    margin-top: 26px;
+    font-size: 0.95rem;
+    letter-spacing: 0.08em;
+    color: var(--paper-dim);
+    z-index: 3;
+    position:relative;
+  }
+  .subtitle .sep{ color: var(--red-bright); margin: 0 10px; }
+
+  .join-btn{
+    margin-top: 46px;
+    z-index: 3;
+    position: relative;
+    display:inline-flex;
+    align-items:center;
+    gap: 12px;
+    padding: 16px 34px;
+    background: transparent;
+    border: 2px solid var(--red-bright);
+    color: var(--paper);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.12em;
+    text-decoration:none;
+    transform: rotate(-1.5deg);
+    transition: transform 0.35s ease, background 0.35s ease, color 0.35s ease, box-shadow 0.35s ease;
+    box-shadow: 0 0 0 rgba(214,64,47,0);
+  }
+  .join-btn:hover{
+    transform: rotate(0deg) scale(1.04);
+    background: var(--red-bright);
+    color: var(--black);
+    box-shadow: 0 10px 40px rgba(214,64,47,0.35);
+  }
+  .join-btn svg{ width:18px; height:18px; fill: currentColor; }
+
+  .status-line{
+    margin-top: 20px;
+    font-size: 0.68rem;
+    color: var(--paper-dim);
+    letter-spacing: 0.1em;
+    z-index: 3;
+    position: relative;
+  }
+  .status-line span{ color: var(--amber); }
+
+  .scroll-cue{
+    position:absolute;
+    bottom: 34px;
+    left:50%;
+    transform: translateX(-50%);
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    color: var(--paper-dim);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:8px;
+    z-index: 3;
+  }
+  .scroll-cue .bar{
+    width:1px; height: 40px;
+    background: linear-gradient(to bottom, var(--red-bright), transparent);
+    animation: dropline 1.8s ease-in-out infinite;
+  }
+  @keyframes dropline{
+    0%{ transform: scaleY(0); transform-origin: top; }
+    50%{ transform: scaleY(1); transform-origin: top; }
+    51%{ transform: scaleY(1); transform-origin: bottom; }
+    100%{ transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* ---------- section shared ---------- */
+  section{
+    position: relative;
+    z-index: 5;
+    padding: 120px 6vw;
+  }
+  .section-head{
+    display:flex;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+    margin-bottom: 60px;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .section-head h2{
+    font-size: clamp(2.4rem, 5vw, 3.6rem);
+    color: var(--paper);
+  }
+  .section-head .ref{
+    font-size: 0.72rem;
+    color: var(--red-bright);
+    letter-spacing: 0.15em;
+  }
+
+  /* ---------- dossiers / folders ---------- */
+  .dossiers{
+    display:grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 48px;
+    perspective: 1600px;
+  }
+  @media (max-width: 860px){
+    .dossiers{ grid-template-columns: 1fr; }
+  }
+
+  .folder{
+    position:relative;
+    transform-style: preserve-3d;
+    min-height: 420px;
+  }
+
+  .folder-body{
+    position: relative;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    padding: 34px 30px 30px;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.6s cubic-bezier(.2,.9,.3,1), box-shadow 0.6s ease;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.35);
+  }
+  .folder:hover .folder-body{
+    transform: rotateX(4deg) rotateY(-3deg) translateY(-8px);
+    box-shadow: 0 50px 90px rgba(0,0,0,0.55);
+  }
+
+  .folder-tab{
+    position:absolute;
+    top: -22px; left: 30px;
+    background: var(--amber);
+    color: var(--black);
+    font-family: 'Big Shoulders Stencil', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    letter-spacing: 0.1em;
+    padding: 6px 18px 8px;
+    transform: translateZ(20px);
+  }
+
+  .folder-body h3{
+    font-size: 2.1rem;
+    color: var(--paper);
+    margin-bottom: 8px;
+  }
+  .folder-meta{
+    font-size: 0.7rem;
+    color: var(--paper-dim);
+    letter-spacing: 0.08em;
+    margin-bottom: 24px;
+    border-bottom: 1px dashed var(--line);
+    padding-bottom: 18px;
+  }
+
+  .item-row{
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.85rem;
+  }
+  .item-row:last-of-type{ border-bottom: none; }
+  .item-name{ color: var(--paper); }
+  .item-name .num{ color: var(--paper-dim); margin-right: 10px; }
+
+  .badge{
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge.online{ color: #7ea67a; }
+  .badge.dl{ color: var(--red-bright); }
+
+  .folder-note{
+    margin-top: 22px;
+    font-size: 0.72rem;
+    color: var(--paper-dim);
+    line-height: 1.6;
+    border-left: 2px solid var(--red);
+    padding-left: 14px;
+  }
+
+  /* ---------- discord panel ---------- */
+  .discord-panel{
+    margin-top: 90px;
+    position: relative;
+    border: 1px solid var(--line);
+    background: linear-gradient(135deg, rgba(164,36,28,0.06), transparent 60%), var(--charcoal);
+    padding: 54px 6vw;
+    display:flex;
+    align-items:center;
+    justify-content: space-between;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+  .discord-panel h3{
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    max-width: 640px;
+    line-height: 1.15;
+  }
+  .discord-panel p{
+    color: var(--paper-dim);
+    font-size: 0.85rem;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-top: 14px;
+  }
+
+  /* ---------- footer ---------- */
+  footer{
+    position: relative;
+    z-index: 5;
+    padding: 50px 6vw 40px;
+    border-top: 1px solid var(--line);
+    display:flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 0.68rem;
+    color: var(--paper-dim);
+    letter-spacing: 0.08em;
+  }
+  footer .brand{ color: var(--paper); font-family: 'Big Shoulders Stencil', sans-serif; font-size: 1.1rem; letter-spacing: 0.05em; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="scanline"></div>
+<div class="noise-vignette"></div>
+
+<header>
+  <div>SERVERLARP <span class="tag">// ACCÈS RESTREINT</span></div>
+  <div id="clock">--:--:--</div>
+</header>
+
+<section class="hero" id="top">
+  <div class="globe-wrap">
+    <div class="sweep"></div>
+    <div class="globe">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+    </div>
+  </div>
+
+  <div class="title-stack" id="tiltTitle">
+    <h1 class="title-main">SERVERLARP<span class="redact-bar"></span></h1>
+  </div>
+
+  <div class="subtitle">RENSEIGNEMENT <span class="sep">/</span> OUTILS <span class="sep">/</span> RESSOURCES <span class="sep">/</span> COMMUNAUTÉ OSINT</div>
+
+  <a class="join-btn" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
+    REJOINDRE LE SERVEUR
+  </a>
+
+  <div class="status-line">STATUT DU DISCORD : <span>OUVERT</span><span id="sync">2</span> MIN</div>
+
+  <div class="scroll-cue"><div class="bar"></div>DÉFILER</div>
+</section>
+
+<section id="dossiers-section">
+  <div class="section-head">
+    <h2>Dossiers</h2>
+    <div class="ref">ARCHIVE — ACCÈS PARTIEL EN LIGNE</div>
+  </div>
+
+  <div class="dossiers">
+
+    <div class="folder">
+      <div class="folder-tab">DOSSIER 01 — EBOOKS</div>
+      <div class="folder-body">
+        <h3>eBooks</h3>
+        <div class="folder-meta">Extrait de l'archive</div>
+
+        <div class="item-row">
+          <span class="item-name"><span class="num">01</span>Guide d'introduction à l'OSINT</span>
+          <span class="badge online">EN LIGNE</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">02</span>Cartographie des identités numériques</span>
+          <span class="badge online">EN LIGNE</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">03</span>Méthodologie de vérification des sources</span>
+          <span class="badge dl">DISCORD UNIQUEMENT</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">04</span>Compendium — recherche par image inversée</span>
+          <span class="badge dl">DISCORD UNIQUEMENT</span>
+        </div>
+
+        <div class="folder-note">
+          Bibliothèque complète disponible dans la catégorie Ebooks du Discord. Les fichiers marqués « Discord uniquement » sont distribués directement sur le serveur.
+        </div>
+      </div>
+    </div>
+
+    <div class="folder">
+      <div class="folder-tab">DOSSIER 02 — TOOLS</div>
+      <div class="folder-body">
+        <h3>Tools</h3>
+        <div class="folder-meta">Aperçu — la moitié de l'arsenal reste sur Discord</div>
+
+        <div class="item-row">
+          <span class="item-name"><span class="num">01</span>Recon Scanner — cartographie de surface</span>
+          <span class="badge online">EN LIGNE</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">02</span>Username Tracker</span>
+          <span class="badge online">EN LIGNE</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">03</span>Metadata Extractor</span>
+          <span class="badge dl">DISCORD UNIQUEMENT</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">04</span>IP Geolocator Lite</span>
+          <span class="badge dl">DISCORD UNIQUEMENT</span>
+        </div>
+        <div class="item-row">
+          <span class="item-name"><span class="num">05</span>+ 12 autres outils</span>
+          <span class="badge dl">DISCORD UNIQUEMENT</span>
+        </div>
+
+        <div class="folder-note">
+          Les outils marqués « téléchargement » nécessitent de récupérer un fichier fourni sur le serveur avant utilisation. Le reste de la boîte à outils — non listé ici — est exclusivement accessible dans le salon #tools du Discord.
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="discord-panel">
+    <div>
+      <h3>Le reste du dossier est sur Discord.</h3>
+      <p>ServerLarp est avant tout un serveur Discord : OSINT, outils, eBooks, entraide et veille. Ce site n'affiche qu'un extrait de l'archive. Rejoins le serveur pour accéder à l'intégralité des salons, des fichiers et des mises à jour.</p>
+    </div>
+    <a class="join-btn" href="https://discord.gg/5H9yJTQEE5" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M20.3 4.4A18 18 0 0 0 15.9 3c-.2.4-.5 1-.6 1.4a16.7 16.7 0 0 0-6.6 0c-.2-.4-.4-1-.6-1.4a18 18 0 0 0-4.4 1.4C1.2 9 .5 13.5.8 18a18 18 0 0 0 5.5 2.7c.4-.6.8-1.3 1.1-2a11 11 0 0 1-1.8-.8l.4-.3a13 13 0 0 0 11 0l.4.3c-.6.3-1.2.6-1.8.8.3.7.7 1.4 1.1 2A18 18 0 0 0 22.2 18c.4-5.2-.9-9.7-1.9-13.6ZM8.7 15.3c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Zm6.6 0c-.9 0-1.6-.8-1.6-1.8s.7-1.8 1.6-1.8 1.7.8 1.6 1.8c0 1-.7 1.8-1.6 1.8Z"/></svg>
+      ACCÉDER AU SERVEUR
+    </a>
+  </div>
+</section>
+
+<script>
+  // live clock
+  function tick(){
+    const d = new Date();
+    document.getElementById('clock').textContent = d.toLocaleTimeString('fr-FR');
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  document.getElementById('footDate').textContent = new Date().toLocaleDateString('fr-FR');
+
+  // fake sync counter, purely decorative
+  let syncMin = 2;
+  setInterval(() => {
+    syncMin = (syncMin % 9) + 1;
+    document.getElementById('sync').textContent = syncMin;
+  }, 8000);
+
+  // mouse parallax on hero title/globe
+  const hero = document.getElementById('top');
+  const title = document.getElementById('tiltTitle');
+  const globe = document.querySelector('.globe-wrap');
+  hero.addEventListener('mousemove', (e) => {
+    const x = (e.clientX / window.innerWidth - 0.5);
+    const y = (e.clientY / window.innerHeight - 0.5);
+    title.style.transform = `rotateY(${x * 8}deg) rotateX(${-y * 8}deg)`;
+    globe.style.transform = `translate(calc(-50% + ${x * 24}px), calc(-55% + ${y * 24}px))`;
+  });
+  hero.addEventListener('mouseleave', () => {
+    title.style.transform = 'rotateY(0deg) rotateX(0deg)';
+  });
+</script>
+
+</body>
+</html>
