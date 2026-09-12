@@ -26,7 +26,9 @@
       --text: #d8d5cd;
       --dim: #7d8188;
       --red-2: #e0483a;
-      --line: rgba(216,213,205,0.08);
+      /* ═══ CONTOURS NOIRS (au lieu du blanc/gris) ═══ */
+      --line: #1a1a1a;
+      --line-hover: #2a2a2a;
     }
 
     h1, h2, h3 {
@@ -304,11 +306,11 @@
       align-self: flex-start;
     }
     .tool-badge.web {
-      border-color: rgba(216,213,205,0.2);
+      border-color: var(--line);
       color: #8899bb;
     }
     .tool-badge.discord {
-      border-color: rgba(216,213,205,0.08);
+      border-color: var(--line);
       color: var(--dim);
     }
 
@@ -337,6 +339,11 @@
       gap: 10px;
       font-size: clamp(0.65rem, 1.2vw, 0.72rem);
       color: var(--dim);
+    }
+
+    /* Séparateur de la section outils (bordure haute) */
+    .tools-section > div:last-child {
+      border-top-color: var(--line) !important;
     }
 
     @media (max-width: 480px) {
