@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>FranceLarp 🟠 </title>
+  <title>FranceLarp 🌌 </title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <style>
@@ -51,16 +51,33 @@
       font-size: clamp(1rem, 3vw, 1.15rem);
       letter-spacing: 0.02em;
     }
+
+    /* ═══════════════════════════════════════════════
+       DÉGRADÉ PERSONNALISÉ — RGB(0,7,255) → BLANC → RGB(255,0,217)
+       Avec reflet blanc et animation de mouvement
+    ═══════════════════════════════════════════════ */
     .brand-gradient {
-      background: linear-gradient(100deg, #ff8a1e 0%, #ffc93f 22%, #fff7dd 42%, #ffffff 50%, #fff7dd 58%, #ffc93f 78%, #ff8a1e 100%);
-      background-size: 220% 100%;
+      background: linear-gradient(
+        100deg,
+        rgb(0, 7, 255) 0%,
+        rgb(0, 7, 255) 12%,
+        rgb(120, 60, 255) 25%,
+        rgb(255, 255, 255) 42%,
+        rgb(255, 255, 255) 50%,
+        rgb(255, 255, 255) 58%,
+        rgb(255, 120, 230) 75%,
+        rgb(255, 0, 217) 88%,
+        rgb(255, 0, 217) 100%
+      );
+      background-size: 300% 100%;
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      animation: brandShine 5s linear infinite;
+      animation: brandShine 4s linear infinite;
     }
     @keyframes brandShine {
-      to { background-position: -220% 0; }
+      0%   { background-position:   0% 50%; }
+      100% { background-position: -300% 50%; }
     }
     
     /* Style unique pour tous les boutons Discord */
@@ -122,33 +139,33 @@
       touch-action: none;
     }
 
-.globe-content {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  text-align: center;
-  z-index: 10;
-  pointer-events: none;
-  width: 120%; /* ← Augmenté de 85% à 120% pour dépasser */
-}
+    .globe-content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      z-index: 10;
+      pointer-events: none;
+      width: 120%;
+    }
 
-.globe-content h1 {
-  font-family: 'Big Shoulders', sans-serif;
-  font-size: clamp(4rem, 15vw, 10rem); /* ← Augmenté */
-  font-weight: 900;
-  line-height: 0.9;
-  letter-spacing: -0.01em;
-  margin: 0;
-  text-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.7); /* ← Ajouté pour lisibilité */
-}
+    .globe-content h1 {
+      font-family: 'Big Shoulders', sans-serif;
+      font-size: clamp(4rem, 15vw, 10rem);
+      font-weight: 900;
+      line-height: 0.9;
+      letter-spacing: -0.01em;
+      margin: 0;
+      text-shadow: 0 0 40px rgba(0,0,0,0.9), 0 0 80px rgba(0,0,0,0.7);
+    }
 
-.globe-content .subtitle-globe {
-  font-size: clamp(1rem, 2.5vw, 1.5rem); /* ← Augmenté */
-  color: var(--dim);
-  margin-top: 12px;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.9);
-}
+    .globe-content .subtitle-globe {
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      color: var(--dim);
+      margin-top: 12px;
+      text-shadow: 0 2px 30px rgba(0,0,0,0.9);
+    }
 
     .stage {
       position: relative;
